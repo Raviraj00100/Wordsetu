@@ -183,16 +183,18 @@ export const KathaSetuView: React.FC<KathaSetuViewProps> = ({
       )}
 
       {/* Hero KathaSetu Discovery Banner */}
-      <section style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #4338ca 100%)',
-        borderRadius: '24px',
-        padding: '36px 32px',
-        color: '#ffffff',
-        boxShadow: '0 12px 36px rgba(29, 78, 216, 0.25)',
-        position: 'relative',
-        overflow: 'hidden',
-        marginBottom: '28px'
-      }}>
+      <section
+        className="katha-discovery-banner"
+        style={{
+          background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #4338ca 100%)',
+          borderRadius: '24px',
+          color: '#ffffff',
+          boxShadow: '0 12px 36px rgba(29, 78, 216, 0.25)',
+          position: 'relative',
+          overflow: 'hidden',
+          marginBottom: '28px'
+        }}
+      >
         <div style={{ maxWidth: '780px', position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
             <span style={{
@@ -274,15 +276,18 @@ export const KathaSetuView: React.FC<KathaSetuViewProps> = ({
       </section>
 
       {/* Language Switcher Tabs */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px',
-        marginBottom: '20px'
-      }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div
+        className="katha-lang-tabs-wrapper"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          marginBottom: '20px'
+        }}
+      >
+        <div className="katha-lang-tabs-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {[
             { code: 'en', label: 'English', native: 'English', count: stats?.en || 0 },
             { code: 'hi', label: 'Hindi', native: 'हिंदी', count: stats?.hi || 0 },
@@ -612,8 +617,8 @@ export const KathaSetuView: React.FC<KathaSetuViewProps> = ({
       {paginatedStories.length > 0 ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+          gap: '16px',
           marginBottom: '32px'
         }}>
           {paginatedStories.map(story => {

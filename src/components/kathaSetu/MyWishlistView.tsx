@@ -361,8 +361,8 @@ export const MyWishlistView: React.FC<MyWishlistViewProps> = ({
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '20px'
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+          gap: '16px'
         }}>
           {filteredStories.map(story => {
             const progress = readingProgressMap[story.id] || 0;

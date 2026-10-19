@@ -408,12 +408,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       )}
 
-      {/* Mobile Bottom Navigation Bar (Home, Daily Words, Stories, Reading Test, Wishlist) */}
+      {/* Mobile Bottom Navigation Bar (Home, Daily Words, Stories, Quiz, Profile) */}
       <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div className="mobile-bottom-grid">
           <button
             className={`mobile-tab-btn ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => handleNavClick('home')}
+            aria-label="Home"
           >
             <BookOpen size={18} />
             <span>Home</span>
@@ -422,14 +423,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             className={`mobile-tab-btn ${activeTab === 'learn' ? 'active' : ''}`}
             onClick={() => handleNavClick('learn')}
+            aria-label="Daily Words"
           >
             <Sparkles size={18} />
-            <span>Daily 20</span>
+            <span>Daily Words</span>
           </button>
 
           <button
             className={`mobile-tab-btn ${activeTab === 'stories' ? 'active' : ''}`}
             onClick={() => handleNavClick('stories')}
+            aria-label="Stories"
           >
             <Library size={18} />
             <span>Stories</span>
@@ -438,19 +441,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             className={`mobile-tab-btn ${activeTab === 'quiz' ? 'active' : ''}`}
             onClick={() => handleNavClick('quiz')}
+            aria-label="Quiz"
           >
             <CheckCircle2 size={18} />
             <span>Quiz</span>
           </button>
 
           <button
-            className={`mobile-tab-btn ${activeTab === 'wishlist' ? 'active' : ''}`}
-            onClick={() => handleNavClick('wishlist')}
+            className={`mobile-tab-btn ${['progress', 'settings', 'shelf', 'vocabulary'].includes(activeTab) || isMobileDrawerOpen ? 'active' : ''}`}
+            onClick={() => setIsMobileDrawerOpen(prev => !prev)}
+            aria-label="Profile and Menu"
           >
-            <Heart size={18} />
-            <span>Wishlist</span>
+            <User size={18} />
+            <span>Profile</span>
             {wishlistCount > 0 && (
-              <span className="mobile-wishlist-count">{wishlistCount}</span>
+              <span className="mobile-wishlist-count" title={`${wishlistCount} saved in wishlist`}>
+                {wishlistCount}
+              </span>
             )}
           </button>
         </div>

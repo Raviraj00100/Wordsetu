@@ -3457,3 +3457,584 @@ input {
   border-top: 1px solid #f1f5f9;
 }
 
+/* ==========================================================================
+   WORDSETU MASTER MOBILE-FIRST RESPONSIVE FIXES (320px - 1024px)
+   ========================================================================== */
+
+/* Universal Mobile Safeguards */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Responsive Container */
+@media (max-width: 768px) {
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+
+/* Safe-Area Bottom Clearance for Fixed Mobile Nav */
+@media (max-width: 1024px) {
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  main {
+    padding-bottom: 24px;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* 1. Header & Navigation Mobile Optimization */
+@media (max-width: 768px) {
+  .navbar-wrapper {
+    height: 56px !important;
+  }
+  .navbar-container {
+    height: 56px !important;
+    padding: 0 12px !important;
+  }
+  .navbar-brand {
+    gap: 8px !important;
+  }
+  .brand-logo-frame {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+  }
+  .brand-logo-img {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .brand-name {
+    font-size: 18px !important;
+    letter-spacing: -0.3px !important;
+  }
+  .brand-tagline {
+    font-size: 9px !important;
+  }
+  .navbar-right-toolbar {
+    gap: 6px !important;
+  }
+  .toolbar-icon-btn {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+  }
+  .search-trigger {
+    padding: 0 10px !important;
+    height: 34px !important;
+  }
+  .nav-streak-pill {
+    padding: 4px 8px !important;
+    font-size: 11.5px !important;
+    border-radius: 9999px !important;
+  }
+  .mobile-hamburger-btn {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Fixed Bottom Nav Bar */
+  .mobile-bottom-nav {
+    display: block !important;
+    height: 60px !important;
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .mobile-bottom-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 2px !important;
+    height: 100% !important;
+  }
+  .mobile-tab-btn {
+    font-size: 10.5px !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    padding: 2px !important;
+  }
+  .mobile-tab-btn span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+  .mobile-wishlist-count {
+    top: 2px !important;
+    right: 12% !important;
+    font-size: 9px !important;
+    padding: 1px 4px !important;
+  }
+}
+
+/* 2. Hero Banner Mobile Optimization */
+@media (max-width: 900px) {
+  .hero-redesign-banner {
+    padding: 16px 0 20px !important;
+  }
+  .hero-banner-inner {
+    grid-template-columns: 1fr !important;
+    padding: 22px 16px !important;
+    gap: 20px !important;
+    border-radius: 20px !important;
+  }
+  .hero-text-column {
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+  .hero-badge-pill {
+    font-size: 11.5px !important;
+    padding: 4px 10px !important;
+    margin-bottom: 12px !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+  }
+  .hero-headline {
+    font-size: clamp(24px, 6.5vw, 34px) !important;
+    line-height: 1.2 !important;
+    margin-bottom: 10px !important;
+    word-break: break-word !important;
+  }
+  .hero-tagline {
+    font-size: clamp(14.5px, 4.2vw, 18px) !important;
+    line-height: 1.35 !important;
+    margin-bottom: 10px !important;
+  }
+  .hero-description {
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 16px !important;
+  }
+  .hero-quote-card {
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    margin-bottom: 18px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .quote-text {
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+  }
+  .hero-cta-group {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+    margin-bottom: 18px !important;
+  }
+  .hero-btn-primary, .hero-btn-secondary {
+    width: 100% !important;
+    padding: 13px 18px !important;
+    font-size: 14.5px !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+  .hero-language-strip {
+    padding-top: 12px !important;
+    gap: 8px !important;
+  }
+  .hero-lang-pills {
+    gap: 4px !important;
+  }
+  .lang-pill {
+    font-size: 10.5px !important;
+    padding: 2px 6px !important;
+  }
+  .hero-illustration-column {
+    width: 100% !important;
+  }
+  .hero-illustration-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+  .hero-scenic-image {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 220px !important;
+    aspect-ratio: 16/10 !important;
+    object-fit: cover !important;
+  }
+  .hero-illustration-glass-badge {
+    bottom: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+  }
+  .glass-badge-avatar {
+    font-size: 16px !important;
+  }
+  .glass-badge-title {
+    font-size: 11.5px !important;
+  }
+  .glass-badge-subtitle {
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-banner-inner {
+    padding: 14px 10px !important;
+  }
+  .hero-headline {
+    font-size: 22px !important;
+  }
+  .hero-tagline {
+    font-size: 14px !important;
+  }
+}
+
+/* 3. Feature Cards Mobile Optimization */
+@media (max-width: 680px) {
+  .feature-cards-section {
+    margin: 20px 0 20px !important;
+  }
+  .feature-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .feature-card {
+    padding: 18px 16px !important;
+    border-radius: 18px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .feature-card-title {
+    font-size: 18px !important;
+  }
+  .feature-card-subtitle {
+    font-size: 12.5px !important;
+  }
+  .feature-card-desc {
+    font-size: 12.5px !important;
+    line-height: 1.45 !important;
+  }
+  .feature-card-footer {
+    padding-top: 10px !important;
+  }
+}
+
+/* 4. Learning Statistics Bar Mobile Optimization */
+@media (max-width: 640px) {
+  .learning-stats-section {
+    margin: 10px 0 24px !important;
+  }
+  .learning-stats-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px 8px !important;
+    padding: 14px 12px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+  }
+  .learning-stat-card {
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+  .stat-icon-wrapper {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    flex-shrink: 0 !important;
+  }
+  .stat-value {
+    font-size: 16px !important;
+    word-break: break-all !important;
+  }
+  .stat-label {
+    font-size: 11px !important;
+  }
+  .stat-divider {
+    display: none !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .learning-stats-container {
+    padding: 10px 8px !important;
+    gap: 8px !important;
+  }
+  .stat-value {
+    font-size: 14px !important;
+  }
+  .stat-label {
+    font-size: 10px !important;
+  }
+}
+
+/* 5. Popular Story Categories Mobile Carousel */
+@media (max-width: 640px) {
+  .categories-section {
+    margin: 24px 0 32px !important;
+  }
+  .categories-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .categories-controls {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .categories-title {
+    font-size: 20px !important;
+  }
+  .categories-subtitle {
+    font-size: 13px !important;
+  }
+  .categories-carousel-track {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    gap: 12px !important;
+    padding: 4px 2px 14px !important;
+  }
+  .category-card {
+    flex: 0 0 220px !important;
+    border-radius: 16px !important;
+    min-width: 0 !important;
+  }
+  .category-img-container {
+    height: 120px !important;
+  }
+  .category-card-body {
+    padding: 12px !important;
+  }
+  .category-card-title {
+    font-size: 15px !important;
+  }
+  .category-card-desc {
+    font-size: 12px !important;
+  }
+}
+
+/* 6. Daily Words (Learn View) Mobile Optimization */
+@media (max-width: 640px) {
+  .learn-view-wrapper {
+    padding: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .learn-day-selector-card {
+    padding: 12px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .learn-top-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .learn-top-bar > button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 14px !important;
+  }
+  .step-indicator {
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .step-pills {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    padding: 4px 2px !important;
+    justify-content: flex-start !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .step-pills::-webkit-scrollbar {
+    display: none !important;
+  }
+  .vocab-main-card {
+    padding: 18px 14px !important;
+    border-radius: 18px !important;
+    margin-bottom: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .vocab-word-large {
+    font-size: clamp(24px, 7.5vw, 34px) !important;
+    word-break: break-word !important;
+  }
+  .vocab-phonetic-text {
+    font-size: 14px !important;
+  }
+  .audio-large-btn {
+    width: 44px !important;
+    height: 44px !important;
+    flex-shrink: 0 !important;
+  }
+  .translation-hero-card {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    margin-bottom: 20px !important;
+  }
+  .translation-hero-text {
+    font-size: 20px !important;
+    word-break: break-word !important;
+  }
+  .examples-section {
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+  .example-item {
+    padding: 10px !important;
+  }
+  .example-en-text {
+    font-size: 13.5px !important;
+  }
+  .example-native-text {
+    font-size: 13px !important;
+  }
+  .learn-navigation-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+  .btn-nav, .btn-mark-learned {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 13px 18px !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 7. Story Discovery Library Mobile Optimization */
+@media (max-width: 640px) {
+  .katha-discovery-banner {
+    padding: 20px 16px !important;
+    border-radius: 18px !important;
+    margin-bottom: 18px !important;
+  }
+  .katha-discovery-banner h1 {
+    font-size: 22px !important;
+    line-height: 1.25 !important;
+  }
+  .katha-discovery-banner p {
+    font-size: 13.5px !important;
+    margin-bottom: 14px !important;
+  }
+  .katha-lang-tabs-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .katha-lang-tabs-row {
+    overflow-x: auto !important;
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 6px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  .katha-lang-tabs-row::-webkit-scrollbar {
+    display: none !important;
+  }
+  .katha-lang-tabs-row button {
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* 8. Story Reader Mobile Optimization */
+@media (max-width: 640px) {
+  .story-reader-header {
+    padding: 8px 12px !important;
+  }
+  .story-reader-main {
+    padding: 20px 14px calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .story-reader-main h1 {
+    font-size: 24px !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+  }
+  .story-reader-main p {
+    font-size: 16px !important;
+    line-height: 1.7 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
+
+/* 9. Quiz & Reading Test Mobile Optimization */
+@media (max-width: 640px) {
+  .quiz-wrapper {
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .quiz-card {
+    padding: 18px 14px !important;
+    border-radius: 18px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .quiz-word-large {
+    font-size: 26px !important;
+  }
+  .quiz-options-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .quiz-option-btn {
+    min-height: 48px !important;
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    word-break: break-word !important;
+  }
+  .quiz-complete-card {
+    padding: 24px 16px !important;
+    border-radius: 18px !important;
+  }
+  .complete-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+  .complete-actions > button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+

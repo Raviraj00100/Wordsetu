@@ -325,18 +325,20 @@ export const StoryReader: React.FC<StoryReaderProps> = ({
       </div>
 
       {/* Reader Sticky Header */}
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        background: themeStyles.navBg,
-        backdropFilter: 'blur(10px)',
-        borderBottom: `1px solid ${themeStyles.border}`,
-        padding: '10px 20px',
-        zIndex: 90,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
+      <header
+        className="story-reader-header"
+        style={{
+          position: 'sticky',
+          top: 0,
+          background: themeStyles.navBg,
+          backdropFilter: 'blur(10px)',
+          borderBottom: `1px solid ${themeStyles.border}`,
+          zIndex: 90,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
             onClick={onBack}
@@ -585,10 +587,10 @@ export const StoryReader: React.FC<StoryReaderProps> = ({
       {/* Main Reading Container */}
       <main
         ref={contentRef}
+        className="story-reader-main"
         style={{
           maxWidth: '720px',
-          margin: '0 auto',
-          padding: '40px 24px 80px'
+          margin: '0 auto'
         }}
       >
         {/* Story Metadata Header */}

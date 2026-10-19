@@ -129,7 +129,7 @@ export const ReadingTestView: React.FC = () => {
           </p>
 
           {/* Difficulty Filter */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px', flexWrap: 'wrap' }}>
             {['all', 'beginner', 'intermediate', 'advanced'].map(d => (
               <button
                 key={d}
@@ -155,7 +155,7 @@ export const ReadingTestView: React.FC = () => {
 
       {/* State 1: Passage Selector */}
       {!activePassage && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px' }}>
           {filteredPassages.map(passage => (
             <div
               key={passage.id}
