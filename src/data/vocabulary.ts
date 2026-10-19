@@ -3030,4 +3030,4 @@ export const VOCABULARY_DATA: VocabularyWord[] = [
   }
 ];
 
-export const TOTAL_DAILY_WORDS = 10;
+export const TOTAL_DAILY_WORDS = 20;

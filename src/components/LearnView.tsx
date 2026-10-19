@@ -8,7 +8,9 @@ import {
   ArrowRight,
   Sparkles,
   BookOpen,
-  Info
+  Info,
+  Calendar,
+  RotateCcw
 } from 'lucide-react';
 import { VocabularyWord } from '../data/vocabulary';
 import { Language } from '../data/languages';
@@ -28,6 +30,9 @@ interface LearnViewProps {
   onStartQuiz: () => void;
   onSearchWord: (word: string) => void;
   isSearchLoading?: boolean;
+  lessonNumber?: number;
+  calendarLessonDay?: number;
+  onSelectDay?: (day: number) => void;
 }
 
 export const LearnView: React.FC<LearnViewProps> = ({
@@ -42,8 +47,17 @@ export const LearnView: React.FC<LearnViewProps> = ({
   onBackToHome,
   onStartQuiz,
   onSearchWord,
-  isSearchLoading = false
+  isSearchLoading = false,
+  lessonNumber = 1,
+  calendarLessonDay = 1,
+  onSelectDay
 }) => {
+  const [dayInput, setDayInput] = useState(lessonNumber.toString());
+
+  useEffect(() => {
+    setDayInput(lessonNumber.toString());
+  }, [lessonNumber]);
+
   if (!words || words.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '60px 20px' }}>
@@ -52,7 +66,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
           No Words In Active Lesson
         </h2>
         <p style={{ fontSize: '15px', color: '#64748b', maxWidth: '500px', margin: '0 auto 24px' }}>
-          All daily vocabulary in the pool has been completed! You can search any English word anytime or review your saved library.
+          Explore words from other days or use the search bar above.
         </p>
         <button className="btn-primary" onClick={onBackToHome}>
           Back to Home
@@ -109,16 +123,143 @@ export const LearnView: React.FC<LearnViewProps> = ({
     });
   };
 
-  const translatedMeaning = currentWord.translations[selectedLanguage.code] || currentWord.translations['hi'];
+  const handleDayJump = (e: React.FormEvent) => {
+    e.preventDefault();
+    const d = parseInt(dayInput, 10);
+    if (!isNaN(d) && d >= 1) {
+      onSelectDay?.(d);
+      setCurrentIndex(0);
+    }
+  };
+
+  const translatedMeaning = currentWord.translations[selectedLanguage.code] || currentWord.translations['hi'] || currentWord.word;
+  const completedTodayCount = words.filter(w => learnedWordIds.includes(w.id)).length;
 
   return (
     <div className="learn-view-wrapper">
       {/* Prominent Search Bar on Learn Page */}
-      <div style={{ marginBottom: '24px' }}>
+      <div style={{ marginBottom: '20px' }}>
         <SearchBar
           onSearch={onSearchWord}
           isLoading={isSearchLoading}
         />
+      </div>
+
+      {/* Lesson Navigation Header with Day Selector */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
+        marginBottom: '20px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#eff6ff',
+            color: '#1d4ed8',
+            padding: '6px 14px',
+            borderRadius: '9999px',
+            fontWeight: 800,
+            fontSize: '14px'
+          }}>
+            <Calendar size={16} />
+            <span>Day {lessonNumber} Lesson</span>
+          </div>
+
+          {calendarLessonDay > lessonNumber && (
+            <span style={{ fontSize: '12px', color: '#64748b' }}>
+              (Current Day: {calendarLessonDay})
+            </span>
+          )}
+        </div>
+
+        {/* Day Selector & Jump Form */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {lessonNumber > 1 && (
+            <button
+              onClick={() => {
+                onSelectDay?.(lessonNumber - 1);
+                setCurrentIndex(0);
+              }}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                border: '1px solid #cbd5e1',
+                background: '#ffffff',
+                color: '#334155',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+              title="Previous Day's Lesson"
+            >
+              ← Previous Day
+            </button>
+          )}
+
+          <form onSubmit={handleDayJump} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '12px', color: '#64748b' }}>Go to Day:</span>
+            <input
+              type="number"
+              min="1"
+              value={dayInput}
+              onChange={e => setDayInput(e.target.value)}
+              style={{
+                width: '64px',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                fontSize: '12px',
+                textAlign: 'center'
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: '4px 10px',
+                borderRadius: '6px',
+                background: '#2563eb',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Go
+            </button>
+          </form>
+
+          {lessonNumber < calendarLessonDay && (
+            <button
+              onClick={() => {
+                onSelectDay?.(calendarLessonDay);
+                setCurrentIndex(0);
+              }}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: '#ecfdf5',
+                color: '#047857',
+                border: '1px solid #a7f3d0',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Today's Words →
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Top Bar with Step Indicators */}
@@ -143,7 +284,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
         </button>
 
         <div className="step-indicator">
-          <span>Word {currentIndex + 1} of {words.length}</span>
+          <span>Word {currentIndex + 1} of {words.length} ({completedTodayCount}/20 Mastered)</span>
           <div className="step-pills">
             {words.map((w, idx) => {
               const done = learnedWordIds.includes(w.id);
@@ -180,103 +321,81 @@ export const LearnView: React.FC<LearnViewProps> = ({
         </button>
       </div>
 
-      {/* Main Vocabulary Card */}
+      {/* Main Flashcard Card */}
       <div className="vocab-main-card">
-        {/* Word Title, Pronunciation & Actions */}
-        <div className="vocab-header-row">
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span className={`word-pos-tag ${currentWord.partOfSpeech}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
-                {currentWord.partOfSpeech}
-              </span>
-              {isLearned && (
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  color: '#047857',
-                  background: '#d1fae5',
-                  padding: '3px 8px',
-                  borderRadius: '4px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <CheckCircle size={12} />
-                  Learned
-                </span>
-              )}
-            </div>
-
-            <h2 className="vocab-word-large">{currentWord.word}</h2>
-
-            <div className="vocab-pronunciation-row">
-              <span className="vocab-phonetic-badge">{currentWord.phonetic}</span>
-              <button
-                className={`audio-btn-large ${speakingTarget === 'word' ? 'speaking' : ''}`}
-                onClick={handlePlayWordAudio}
-                aria-label={`Pronounce ${currentWord.word}`}
-              >
-                <Volume2 size={16} />
-                <span>{speakingTarget === 'word' ? 'Playing Audio...' : 'Listen Pronunciation'}</span>
-              </button>
-            </div>
+        {/* Card Header: Level, Word Index, Actions */}
+        <div className="vocab-card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="vocab-pos-pill">{currentWord.partOfSpeech.toUpperCase()}</span>
+            <span className="vocab-pos-pill" style={{ background: '#f8fafc', color: '#64748b' }}>
+              WORD {currentIndex + 1} OF {words.length}
+            </span>
           </div>
 
-          <div className="card-actions-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
-              className={`btn-icon-toggle ${isSaved ? 'active' : ''}`}
+              className={`action-icon-btn ${isSaved ? 'active-saved' : ''}`}
               onClick={() => onToggleSaved(currentWord.id)}
-              title={isSaved ? 'Remove from Saved Words' : 'Save Word to Library'}
-              aria-label={isSaved ? 'Saved in library' : 'Save word'}
+              title={isSaved ? 'Remove from Saved' : 'Save Word'}
+              aria-label={isSaved ? 'Saved to library' : 'Bookmark this word'}
             >
               {isSaved ? <BookmarkCheck size={20} color="#db2777" /> : <Bookmark size={20} />}
             </button>
           </div>
         </div>
 
-        {/* English Definition */}
-        <div className="vocab-def-box">
-          <div className="vocab-def-label">English Definition</div>
-          <div className="vocab-def-text">{currentWord.englishDefinition}</div>
+        {/* Headword & Audio Button */}
+        <div className="vocab-word-row">
+          <div>
+            <h1 className="vocab-word-large">{currentWord.word}</h1>
+            <div className="vocab-phonetic-text">{currentWord.phonetic}</div>
+          </div>
+
+          <button
+            className={`audio-large-btn ${speakingTarget === 'word' ? 'playing' : ''}`}
+            onClick={handlePlayWordAudio}
+            title="Listen to pronunciation"
+            aria-label={`Pronounce ${currentWord.word}`}
+          >
+            <Volume2 size={24} />
+          </button>
         </div>
 
-        {/* Selected-Language Translation Card */}
+        {/* English Definition */}
+        <div className="vocab-def-box">
+          <div className="vocab-def-label">Definition:</div>
+          <p className="vocab-def-text">{currentWord.englishDefinition}</p>
+        </div>
+
+        {/* Native Language Meaning Hero */}
         <div className="translation-hero-card">
-          <div className="translation-hero-content">
-            <span className="translation-pill-tag">
-              <Sparkles size={13} color="#2563eb" />
-              <span>Meaning in {selectedLanguage.name}</span>
+          <div>
+            <span className="translation-hero-badge">
+              Meaning in {selectedLanguage.name} ({selectedLanguage.nativeName})
             </span>
-            <div className="translation-native-large">
+            <div className="translation-hero-text">
               {translatedMeaning}
             </div>
           </div>
-          <div className="translation-accent-flag">
-            {selectedLanguage.accentBadge}
-          </div>
         </div>
 
-        {/* Two Example Sentences with Translation and Audio */}
-        <div className="examples-container">
-          <h3 className="examples-title">
-            <BookOpen size={18} color="#2563eb" />
-            <span>Contextual Example Sentences</span>
-          </h3>
+        {/* Two Contextual Example Sentences with Audio */}
+        <div className="examples-section">
+          <div className="examples-section-title">
+            <BookOpen size={16} color="#2563eb" />
+            <span>Contextual Examples</span>
+          </div>
 
           {currentWord.examples.map((example, idx) => {
-            const sentenceTargetId = `sentence-${idx}`;
-            const isSpeakingThis = speakingTarget === sentenceTargetId;
-            const sentenceTranslation =
-              example.translations[selectedLanguage.code] || example.translations['hi'];
+            const sentenceTranslation = example.translations[selectedLanguage.code] || example.translations['hi'] || '';
+            const isPlayingThis = speakingTarget === `sentence-${idx}`;
 
             return (
-              <div key={idx} className="example-card-item">
-                <div className="example-english-row">
-                  <div className="example-english-text">
-                    "{example.english}"
-                  </div>
+              <div key={idx} className="example-item">
+                <div className="example-en-row">
+                  <p className="example-en-text">"{example.english}"</p>
                   <button
-                    className={`audio-btn-sm ${isSpeakingThis ? 'speaking' : ''}`}
+                    className={`audio-mini-btn ${isPlayingThis ? 'playing' : ''}`}
                     onClick={() => handlePlaySentenceAudio(example.english, idx)}
                     title="Listen to this sentence"
                     aria-label={`Listen to example ${idx + 1}`}
@@ -284,9 +403,11 @@ export const LearnView: React.FC<LearnViewProps> = ({
                     <Volume2 size={15} />
                   </button>
                 </div>
-                <div className="example-native-text">
-                  ↳ {sentenceTranslation}
-                </div>
+                {sentenceTranslation && (
+                  <div className="example-native-text">
+                    ↳ {sentenceTranslation}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -339,10 +460,6 @@ export const LearnView: React.FC<LearnViewProps> = ({
           <span>{currentIndex === words.length - 1 ? 'Start Quiz' : 'Next Word'}</span>
           <ArrowRight size={16} />
         </button>
-      </div>
-
-      <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: '#94a3b8' }}>
-        Tip: You can use your keyboard Left (←) and Right (→) arrow keys to navigate between words.
       </div>
     </div>
   );

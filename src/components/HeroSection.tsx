@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sparkles, ArrowRight, BookOpen, CheckCircle, Volume2 } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Quote, Globe } from 'lucide-react';
 import { Language } from '../data/languages';
 
 interface HeroSectionProps {
   onStartLearning: () => void;
-  onStartQuiz: () => void;
+  onExploreStories?: () => void;
   selectedLanguage: Language;
   lessonNumber?: number;
   wordsCount?: number;
@@ -12,113 +12,102 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onStartLearning,
-  onStartQuiz,
+  onExploreStories,
   selectedLanguage,
   lessonNumber = 1,
-  wordsCount = 10
+  wordsCount = 20
 }) => {
   return (
-    <section className="hero-wrapper" aria-label="Hero Section">
-      <div className="hero-grid">
-        {/* Left Column: Headline, Tagline, CTAs */}
-        <div className="hero-content">
-          <div className="hero-pill">
-            <span className="hero-pill-indicator"></span>
-            <span>Day {lessonNumber} • {wordsCount} New Words (Never Repeated)</span>
+    <section className="hero-redesign-banner" aria-label="Welcome to WordSetu Hero">
+      <div className="hero-banner-inner">
+        {/* Left Column: Rich Typography, Headlines & CTAs */}
+        <div className="hero-text-column">
+          <div className="hero-badge-pill">
+            <span className="hero-badge-pulse" />
+            <Sparkles size={14} color="#f59e0b" />
+            <span>Day {lessonNumber} • {wordsCount} New Words Every 24 Hours</span>
           </div>
 
-          <h1 className="hero-title">
-            Master English Daily,{' '}
-            <span className="hero-title-gradient">In Your Language.</span>
+          <h1 className="hero-headline">
+            Welcome to <span className="hero-brand-highlight">WordSetu!</span>
           </h1>
 
-          <p className="hero-subtitle">
-            WordSetu bridges the gap between English and India's native languages. Build lasting fluency with 10 high-impact words every 24 hours, complete with accurate native meanings in{' '}
-            <strong style={{ color: '#1d4ed8' }}>{selectedLanguage.name} ({selectedLanguage.nativeName})</strong>, authentic pronunciations, and real contextual examples.
+          <p className="hero-tagline">
+            Learn new words, read amazing Indian stories, and grow every day.
           </p>
 
-          <div className="hero-actions">
-            <button className="btn-primary" onClick={onStartLearning}>
-              <span>Start Learning Today</span>
+          <p className="hero-description">
+            Experience an enriching journey through English vocabulary paired with India’s greatest folk tales in{' '}
+            <strong className="hero-lang-accent">
+              {selectedLanguage.name} ({selectedLanguage.nativeName})
+            </strong>
+            , Hindi, Tamil, and Malayalam.
+          </p>
+
+          {/* Inspirational Quote Card */}
+          <div className="hero-quote-card">
+            <Quote size={18} className="quote-icon" />
+            <blockquote className="quote-text">
+              “A reader lives a thousand lives before he dies. Knowledge is the bridge that turns ambition into achievement.”
+            </blockquote>
+          </div>
+
+          {/* Actions */}
+          <div className="hero-cta-group">
+            <button
+              className="hero-btn-primary"
+              onClick={onStartLearning}
+              aria-label="Start Learning English Vocabulary"
+            >
+              <span>Start Learning</span>
               <ArrowRight size={18} />
             </button>
 
-            <button className="btn-secondary" onClick={onStartQuiz}>
-              <CheckCircle size={18} color="#2563eb" />
-              <span>Practice Today's Quiz</span>
-            </button>
+            {onExploreStories && (
+              <button
+                className="hero-btn-secondary"
+                onClick={onExploreStories}
+                aria-label="Explore Indian Stories"
+              >
+                <BookOpen size={18} color="#059669" />
+                <span>Explore Indian Stories</span>
+              </button>
+            )}
           </div>
 
-          {/* Social Proof & Language coverage */}
-          <div className="hero-social-proof">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '13px' }}>
-              <Sparkles size={16} color="#2563eb" />
-              <span style={{ fontWeight: 600 }}>Supports 12 Languages:</span>
+          {/* Language Dots / Social Proof */}
+          <div className="hero-language-strip">
+            <div className="hero-strip-label">
+              <Globe size={15} color="#2563eb" />
+              <span>Multilingual Translations:</span>
             </div>
-            <div className="lang-dots-strip">
-              <span className="lang-mini-badge">हिन्दी</span>
-              <span className="lang-mini-badge">தமிழ்</span>
-              <span className="lang-mini-badge">മലയാളം</span>
-              <span className="lang-mini-badge">తెలుగు</span>
-              <span className="lang-mini-badge">বাংলা</span>
-              <span className="lang-mini-badge">मराठी</span>
-              <span className="lang-mini-badge">+6 more</span>
+            <div className="hero-lang-pills">
+              <span className="lang-pill">English</span>
+              <span className="lang-pill">हिन्दी</span>
+              <span className="lang-pill">தமிழ்</span>
+              <span className="lang-pill">മലയാളം</span>
+              <span className="lang-pill">తెలుగు</span>
+              <span className="lang-pill">বাংলা</span>
+              <span className="lang-pill-more">+6 Indian Languages</span>
             </div>
           </div>
         </div>
 
-        {/* Right Column: 3D Educational Hero Illustration */}
-        <div className="hero-visual-col">
-          <div className="hero-card-frame">
+        {/* Right Column: Hero Scenic Illustration Card */}
+        <div className="hero-illustration-column">
+          <div className="hero-illustration-frame">
             <img
-              src="/assets/hero-education.jpg"
-              alt="WordSetu Educational Illustration with Open Book and Vocabulary Elements"
-              className="hero-card-img"
+              src="/assets/wordsetu_hero.jpg"
+              alt="Indian palace on river bank at sunrise with student reading an open book"
+              className="hero-scenic-image"
               loading="eager"
             />
-            <div style={{
-              position: 'absolute',
-              bottom: '16px',
-              left: '16px',
-              right: '16px',
-              background: 'rgba(255, 255, 255, 0.94)',
-              backdropFilter: 'blur(10px)',
-              padding: '12px 18px',
-              borderRadius: '14px',
-              border: '1px solid rgba(226, 232, 240, 0.8)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: '#eff6ff',
-                  color: '#2563eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Volume2 size={18} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#1e3a8a' }}>Authentic Audio Included</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Every word & example has clear audio</div>
-                </div>
+            <div className="hero-illustration-glass-badge">
+              <div className="glass-badge-avatar">📖</div>
+              <div className="glass-badge-text">
+                <span className="glass-badge-title">WordSetu Indian Storytelling</span>
+                <span className="glass-badge-subtitle">Panchatantra • Birbal • Real-Life • Epics</span>
               </div>
-              <span style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                color: '#059669',
-                background: '#ecfdf5',
-                padding: '3px 8px',
-                borderRadius: '6px'
-              }}>
-                100% Free
-              </span>
             </div>
           </div>
         </div>

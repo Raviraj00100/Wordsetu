@@ -1,10 +1,11 @@
 import React from 'react';
-import { BookOpen, Heart, Sparkles, Globe } from 'lucide-react';
+import { BookOpen, Heart, Sparkles, Globe, Library } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, Language } from '../data/languages';
+import { ActiveNavTab } from './Navbar';
 
 interface FooterProps {
   onSelectLanguage: (lang: Language) => void;
-  onNavigate: (tab: 'home' | 'learn' | 'quiz' | 'saved') => void;
+  onNavigate: (tab: ActiveNavTab) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onSelectLanguage, onNavigate }) => {
@@ -19,32 +20,47 @@ export const Footer: React.FC<FooterProps> = ({ onSelectLanguage, onNavigate }) 
               <span className="brand-title" style={{ fontSize: '20px' }}>WordSetu</span>
             </div>
             <p className="footer-brand-desc">
-              WordSetu is a dedicated English vocabulary platform empowering students across India. We deliver 10 essential words daily with authentic pronunciations, contextual sentences, and verified translations in 12 Indian languages.
+              WordSetu is a comprehensive English learning platform with the KathaSetu multilingual Indian story library. We empower learners with 20 essential words daily, thousands of Indian folk tales across English, Hindi, Tamil, and Malayalam, and comprehensive reading assessments.
             </p>
           </div>
 
           {/* Col 2: Fast Navigation */}
           <div>
-            <h4 className="footer-col-title">Navigation</h4>
+            <h4 className="footer-col-title">Platform Sections</h4>
             <ul className="footer-links">
               <li>
                 <button className="footer-link" onClick={() => onNavigate('home')}>
-                  Home Overview
+                  Home
                 </button>
               </li>
               <li>
                 <button className="footer-link" onClick={() => onNavigate('learn')}>
-                  Daily Vocabulary (10 Words)
+                  Daily Words (20 Words)
+                </button>
+              </li>
+              <li>
+                <button className="footer-link" onClick={() => onNavigate('stories')}>
+                  Stories — KathaSetu
+                </button>
+              </li>
+              <li>
+                <button className="footer-link" onClick={() => onNavigate('search')}>
+                  Word Search
+                </button>
+              </li>
+              <li>
+                <button className="footer-link" onClick={() => onNavigate('reading_test')}>
+                  Reading Test (WPM Assessment)
                 </button>
               </li>
               <li>
                 <button className="footer-link" onClick={() => onNavigate('quiz')}>
-                  Daily Practice Quiz
+                  Daily Quiz
                 </button>
               </li>
               <li>
-                <button className="footer-link" onClick={() => onNavigate('saved')}>
-                  Saved Words Library
+                <button className="footer-link" onClick={() => onNavigate('shelf')}>
+                  My Story Shelf
                 </button>
               </li>
             </ul>
@@ -52,7 +68,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectLanguage, onNavigate }) 
 
           {/* Col 3: Languages Covered */}
           <div>
-            <h4 className="footer-col-title">Supported Languages</h4>
+            <h4 className="footer-col-title">12 Supported Languages</h4>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {SUPPORTED_LANGUAGES.map(lang => (
                 <button
@@ -78,7 +94,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectLanguage, onNavigate }) 
 
         <div className="footer-bottom-row">
           <div>
-            © {new Date().getFullYear()} <strong>WordSetu</strong>. Learn English in Your Language. All rights reserved.
+            © {new Date().getFullYear()} <strong>WordSetu</strong> &amp; <strong>KathaSetu</strong>. Learn English in Your Language. All rights reserved.
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>Built with</span>

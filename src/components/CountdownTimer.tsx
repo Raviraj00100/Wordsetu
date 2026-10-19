@@ -86,7 +86,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         <div>
           <h3 className="card-title">Next Lesson In (Day {lessonNumber + 1})</h3>
           <p className="card-subtitle">
-            10 new unrepeated words unlock every 24 hours
+            20 new unrepeated words unlock every 24 hours
           </p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
       }}>
         <div className="countdown-note" style={{ margin: 0 }}>
           <Sparkles size={14} color="#6366f1" />
-          <span>{remainingEligibleCount} unassigned words waiting in pool</span>
+          <span>Continuous daily learning &bull; Day 1 to 9,000+</span>
         </div>
 
         {onAdvanceLesson && (

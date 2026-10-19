@@ -1,33 +1,31 @@
 import { VocabularyWord } from '../data/vocabulary';
 import { normalizeHeadword } from './wordIdentity';
+import { VocabularyExpansionEngine } from '../data/vocabularyExpansion';
+import { UserProfileService, UserLearningProfile } from './userProfile';
 
 const STORAGE_KEYS = {
-  ACTIVE_LESSON: 'wordsetu_active_lesson_v2',
-  LIFETIME_ASSIGNED_IDS: 'wordsetu_lifetime_assigned_ids_v2',
-  LIFETIME_ASSIGNED_NORMALIZED: 'wordsetu_lifetime_assigned_normalized_v2'
+  ACTIVE_LESSON_V4: 'wordsetu_active_lesson_v4',
+  LIFETIME_ASSIGNED_IDS: 'wordsetu_lifetime_assigned_ids_v4',
+  LIFETIME_ASSIGNED_NORMALIZED: 'wordsetu_lifetime_assigned_normalized_v4',
+  LEARNING_STREAK: 'wordsetu_learning_streak',
+  LAST_LEARN_DATE: 'wordsetu_last_learn_date'
 };
 
-const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-const WORDS_PER_LESSON = 10;
-
-export interface ActiveLessonRecord {
-  lessonNumber: number;
-  startTime: number;
-  assignedWordIds: string[];
-  cycleDurationMs: number;
-}
+export const WORDS_PER_LESSON = 20;
 
 export interface LessonState {
-  lessonNumber: number;
+  lessonNumber: number; // The lesson number currently active/displayed
+  calendarLessonDay: number; // 1 + elapsed calendar days since user's start date
   words: VocabularyWord[];
   startTime: number;
-  nextLessonTime: number;
   remainingMs: number;
   isPoolLow: boolean;
   isPoolExhausted: boolean;
-  remainingEligibleCount: number;
   totalPoolSize: number;
   lifetimeAssignedCount: number;
+  streakDays: number;
+  completedLessonNumbers: number[];
+  learningStartDate: string;
 }
 
 export const LessonManager = {
@@ -75,163 +73,97 @@ export const LessonManager = {
     }
   },
 
-  /**
-   * Retrieve or create the deterministic active 24-hour lesson.
-   * Ensures that words are locked for 24 hours, and when 24 hours elapse,
-   * picks the next 10 eligible unused words without repeating any previously assigned words.
-   */
-  getActiveLessonState(allWords: VocabularyWord[]): LessonState {
-    const now = Date.now();
-    let record: ActiveLessonRecord | null = null;
-
+  getStreakDays(): number {
     try {
-      const stored = localStorage.getItem(STORAGE_KEYS.ACTIVE_LESSON);
-      if (stored) {
-        record = JSON.parse(stored);
+      const stored = localStorage.getItem(STORAGE_KEYS.LEARNING_STREAK);
+      return stored ? parseInt(stored, 10) : 1;
+    } catch {
+      return 1;
+    }
+  },
+
+  updateStreak(): number {
+    try {
+      const today = new Date().toDateString();
+      const lastDate = localStorage.getItem(STORAGE_KEYS.LAST_LEARN_DATE);
+      let streak = this.getStreakDays();
+
+      if (lastDate !== today) {
+        streak += 1;
+        localStorage.setItem(STORAGE_KEYS.LEARNING_STREAK, streak.toString());
+        localStorage.setItem(STORAGE_KEYS.LAST_LEARN_DATE, today);
       }
-    } catch (e) {
-      console.warn('LocalStorage parse error for active lesson:', e);
+      return streak;
+    } catch {
+      return 1;
     }
+  },
 
+  /**
+   * Retrieve active date-based lesson state.
+   * New users ALWAYS start at Day 1.
+   * Day number increases by 1 for each local calendar day elapsed since the user's start date.
+   * Refreshing the page does NOT advance the day.
+   */
+  getActiveLessonState(allWords: VocabularyWord[], specificLessonNumber?: number): LessonState {
+    const profile = UserProfileService.getOrCreateProfile();
+    const streak = this.getStreakDays();
     const lifetimeIds = this.getLifetimeAssignedIds();
-    const lifetimeNorms = this.getLifetimeAssignedNormalized();
 
-    // Check if an existing lesson is still active (within 24 hours)
-    if (record && now < record.startTime + record.cycleDurationMs) {
-      // Find the corresponding words in the master pool
-      const activeWords = record.assignedWordIds
-        .map(id => allWords.find(w => w.id === id))
-        .filter((w): w is VocabularyWord => Boolean(w));
+    // Determine the lesson day to display
+    const activeLessonNum = specificLessonNumber || profile.assignedLessonNumber || profile.calendarLessonDay || 1;
 
-      // Calculate remaining unused words excluding already assigned ones
-      const remainingUnused = allWords.filter(
-        w => !lifetimeIds.has(w.id) && !lifetimeNorms.has(w.normalized)
-      );
+    // Fetch the 20 words for this specific day
+    const dayWords = VocabularyExpansionEngine.generateDayLesson(activeLessonNum, allWords);
 
-      const nextLessonTime = record.startTime + record.cycleDurationMs;
-      const remainingMs = Math.max(0, nextLessonTime - now);
+    // Register assigned words so they are tracked
+    this.markWordsAsAssigned(dayWords);
 
-      return {
-        lessonNumber: record.lessonNumber,
-        words: activeWords,
-        startTime: record.startTime,
-        nextLessonTime,
-        remainingMs,
-        isPoolLow: remainingUnused.length > 0 && remainingUnused.length < WORDS_PER_LESSON,
-        isPoolExhausted: activeWords.length === 0,
-        remainingEligibleCount: remainingUnused.length,
-        totalPoolSize: allWords.length,
-        lifetimeAssignedCount: lifetimeIds.size
-      };
-    }
-
-    // A new lesson must be assigned (either first visit or 24-hr cycle expired)
-    const nextLessonNumber = record ? record.lessonNumber + 1 : 1;
-
-    // Filter eligible words: Must NOT be in lifetime assigned IDs or normalized words
-    const eligiblePool = allWords.filter(
-      w => !lifetimeIds.has(w.id) && !lifetimeNorms.has(w.normalized || normalizeHeadword(w.word))
-    );
-
-    let selectedWords: VocabularyWord[] = [];
-    let isPoolLow = false;
-    let isPoolExhausted = false;
-
-    if (eligiblePool.length === 0) {
-      // Pool is completely exhausted!
-      isPoolExhausted = true;
-      selectedWords = [];
-    } else if (eligiblePool.length < WORDS_PER_LESSON) {
-      // Pool has fewer than 10 words remaining
-      isPoolLow = true;
-      selectedWords = [...eligiblePool];
-    } else {
-      // Select the first 10 eligible words deterministically
-      selectedWords = eligiblePool.slice(0, WORDS_PER_LESSON);
-    }
-
-    // If we have selected words, permanently register them in lifetime history
-    if (selectedWords.length > 0) {
-      this.markWordsAsAssigned(selectedWords);
-    }
-
-    // Set new active lesson start time
-    const newRecord: ActiveLessonRecord = {
-      lessonNumber: nextLessonNumber,
-      startTime: now,
-      assignedWordIds: selectedWords.map(w => w.id),
-      cycleDurationMs: TWENTY_FOUR_HOURS_MS
-    };
-
-    try {
-      localStorage.setItem(STORAGE_KEYS.ACTIVE_LESSON, JSON.stringify(newRecord));
-    } catch (e) {
-      console.warn('LocalStorage error while saving new active lesson:', e);
-    }
-
-    const nextLessonTime = now + TWENTY_FOUR_HOURS_MS;
-    const remainingEligibleCount = Math.max(0, eligiblePool.length - selectedWords.length);
+    // Calculate time until midnight for local 24-hr countdown
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const remainingMs = Math.max(0, midnight.getTime() - now.getTime());
 
     return {
-      lessonNumber: nextLessonNumber,
-      words: selectedWords,
-      startTime: now,
-      nextLessonTime,
-      remainingMs: TWENTY_FOUR_HOURS_MS,
-      isPoolLow,
-      isPoolExhausted,
-      remainingEligibleCount,
-      totalPoolSize: allWords.length,
-      lifetimeAssignedCount: this.getLifetimeAssignedIds().size
+      lessonNumber: activeLessonNum,
+      calendarLessonDay: profile.calendarLessonDay,
+      words: dayWords,
+      startTime: profile.learningStartTimeMs,
+      remainingMs,
+      isPoolLow: false,
+      isPoolExhausted: false,
+      totalPoolSize: 180000, // 9,000+ days capacity
+      lifetimeAssignedCount: lifetimeIds.size,
+      streakDays: streak,
+      completedLessonNumbers: profile.completedLessonNumbers,
+      learningStartDate: profile.learningStartDate
     };
   },
 
   /**
-   * Testing helper to advance to the next daily lesson immediately,
-   * demonstrating that previous words are never recycled!
+   * Navigate to a past lesson or missed lesson for revision.
+   */
+  selectLessonDay(dayNumber: number, allWords: VocabularyWord[]): LessonState {
+    const profile = UserProfileService.getOrCreateProfile();
+    UserProfileService.setActiveLessonNumber(profile, dayNumber);
+    return this.getActiveLessonState(allWords, dayNumber);
+  },
+
+  /**
+   * Mark current lesson completed.
+   */
+  markCurrentLessonCompleted(dayNumber: number): void {
+    const profile = UserProfileService.getOrCreateProfile();
+    UserProfileService.markLessonCompleted(profile, dayNumber);
+  },
+
+  /**
+   * Advance to next lesson day manually (e.g. for testing or when completed).
    */
   advanceToNextLesson(allWords: VocabularyWord[]): LessonState {
-    const now = Date.now();
-    let currentLessonNumber = 1;
-
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.ACTIVE_LESSON);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        currentLessonNumber = parsed.lessonNumber;
-      }
-    } catch (e) {
-      console.warn(e);
-    }
-
-    // Expire the current lesson record by setting startTime back in time
-    const expiredRecord: ActiveLessonRecord = {
-      lessonNumber: currentLessonNumber,
-      startTime: now - TWENTY_FOUR_HOURS_MS - 1000,
-      assignedWordIds: [],
-      cycleDurationMs: TWENTY_FOUR_HOURS_MS
-    };
-
-    try {
-      localStorage.setItem(STORAGE_KEYS.ACTIVE_LESSON, JSON.stringify(expiredRecord));
-    } catch (e) {
-      console.warn(e);
-    }
-
-    return this.getActiveLessonState(allWords);
-  },
-
-  /**
-   * Reset vocabulary history (for user or testing if explicitly requested)
-   */
-  resetHistory(allWords: VocabularyWord[] = []): LessonState {
-    try {
-      localStorage.removeItem(STORAGE_KEYS.ACTIVE_LESSON);
-      localStorage.removeItem(STORAGE_KEYS.LIFETIME_ASSIGNED_IDS);
-      localStorage.removeItem(STORAGE_KEYS.LIFETIME_ASSIGNED_NORMALIZED);
-    } catch (e) {
-      console.warn(e);
-    }
-    return this.getActiveLessonState(allWords);
+    const profile = UserProfileService.getOrCreateProfile();
+    const nextDay = (profile.assignedLessonNumber || 1) + 1;
+    UserProfileService.setActiveLessonNumber(profile, nextDay);
+    return this.getActiveLessonState(allWords, nextDay);
   }
 };

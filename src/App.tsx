@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
+import { Navbar, ActiveNavTab } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { SearchBar } from './components/SearchBar';
 import { SearchResultCard } from './components/SearchResultCard';
@@ -8,34 +8,58 @@ import { CountdownTimer } from './components/CountdownTimer';
 import { TodayWordsPreview } from './components/TodayWordsPreview';
 import { LearnView } from './components/LearnView';
 import { QuizView } from './components/QuizView';
-import { SavedWordsView } from './components/SavedWordsView';
 import { LanguageModal } from './components/LanguageModal';
 import { Footer } from './components/Footer';
+
+// KathaSetu & Master Upgrade Components
+import { KathaSetuView } from './components/kathaSetu/KathaSetuView';
+import { StoryReader } from './components/kathaSetu/StoryReader';
+import { CreateStoryView } from './components/kathaSetu/CreateStoryView';
+import { MyStoryShelfView } from './components/kathaSetu/MyStoryShelfView';
+import { ReadingTestView } from './components/readingTest/ReadingTestView';
+import { MyVocabularyView } from './components/vocabulary/MyVocabularyView';
+import { MyProgressView } from './components/progress/MyProgressView';
+import { SettingsView } from './components/settings/SettingsView';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { MyWishlistView } from './components/kathaSetu/MyWishlistView';
+import { FeatureCards } from './components/FeatureCards';
+import { LearningStats } from './components/LearningStats';
+import { StoryCategories } from './components/StoryCategories';
+import { kathaSetuDb } from './services/db';
+
 import { VOCABULARY_DATA, TOTAL_DAILY_WORDS } from './data/vocabulary';
 import { DictionaryEntry } from './data/dictionaryDatabase';
 import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, Language } from './data/languages';
 import { StorageService } from './utils/storage';
 import { DictionaryService } from './utils/dictionaryService';
 import { LessonManager, LessonState } from './utils/lessonManager';
-import { Sparkles, CheckCircle2, BookmarkCheck, ArrowRight } from 'lucide-react';
+import { KathaSetuEngine } from './services/kathaSetuEngine';
+import { Story } from './types/story';
+import { Sparkles, CheckCircle2, BookmarkCheck, ArrowRight, Library, FileText, Award, BookOpen } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'learn' | 'quiz' | 'saved'>('home');
+  const [activeTab, setActiveTab] = useState<ActiveNavTab>('home');
+  const [activeStory, setActiveStory] = useState<Story | null>(null);
+  const [isCreatingStory, setIsCreatingStory] = useState(false);
+
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(() => {
     const savedCode = StorageService.getLanguage();
     return SUPPORTED_LANGUAGES.find(l => l.code === savedCode) || DEFAULT_LANGUAGE;
   });
+
   const [learnedWordIds, setLearnedWordIds] = useState<string[]>(() =>
     StorageService.getLearnedWords()
   );
+
   const [savedWordIds, setSavedWordIds] = useState<string[]>(() =>
     StorageService.getSavedWordIds()
   );
+
   const [customSavedEntries, setCustomSavedEntries] = useState<DictionaryEntry[]>(() =>
     StorageService.getCustomSavedEntries()
   );
 
-  // Active 24-hr lesson state managed with strict exclusion of previously learned words
+  // Active 24-hr lesson state (upgraded to 20 words per lesson)
   const [lessonState, setLessonState] = useState<LessonState>(() =>
     LessonManager.getActiveLessonState(VOCABULARY_DATA)
   );
@@ -50,15 +74,73 @@ export default function App() {
   const [isNotFound, setIsNotFound] = useState(false);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [isSearchResultOpen, setIsSearchResultOpen] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState<number>(() => kathaSetuDb.getLocalWishlistSet().size);
 
-  // Today's words from active lesson
+  // Redesign Real User Statistics & Category Filtering
+  const [totalStoriesCount, setTotalStoriesCount] = useState<number>(0);
+  const [storiesReadCount, setStoriesReadCount] = useState<number>(0);
+  const [averageQuizScorePct, setAverageQuizScorePct] = useState<number | null>(null);
+  const [lastQuizScore, setLastQuizScore] = useState<{ score: number; total: number } | null>(null);
+  const [storyCategoryFilter, setStoryCategoryFilter] = useState<string>('all');
+
+  // Initialize KathaSetu Library on start & load real user statistics
+  useEffect(() => {
+    KathaSetuEngine.initializeLibrary();
+
+    const loadMetrics = async () => {
+      try {
+        const stats = await KathaSetuEngine.getLibraryStats();
+        if (stats) {
+          setTotalStoriesCount(stats.total);
+        }
+        const progressList = await kathaSetuDb.getAllReadingProgress();
+        setStoriesReadCount(progressList.filter(p => p.completed || p.scrollPercentage >= 50).length);
+
+        const quizRecords = await kathaSetuDb.getAllStoryQuizResults();
+        const savedDailyQuiz = StorageService.getQuizResults();
+        if (savedDailyQuiz) {
+          setLastQuizScore({ score: savedDailyQuiz.score, total: savedDailyQuiz.total });
+        }
+
+        let totalEarned = 0;
+        let totalMax = 0;
+        if (savedDailyQuiz && savedDailyQuiz.total > 0) {
+          totalEarned += savedDailyQuiz.score;
+          totalMax += savedDailyQuiz.total;
+        }
+        quizRecords.forEach(q => {
+          totalEarned += q.score;
+          totalMax += q.total;
+        });
+        if (totalMax > 0) {
+          setAverageQuizScorePct(Math.round((totalEarned / totalMax) * 100));
+        }
+      } catch (e) {
+        console.error('Error fetching statistics:', e);
+      }
+    };
+
+    loadMetrics();
+
+    const handleWishlistUpdate = () => {
+      setWishlistCount(kathaSetuDb.getLocalWishlistSet().size);
+    };
+
+    window.addEventListener('wordsetu_wishlist_updated', handleWishlistUpdate);
+    window.addEventListener('story_library_updated', loadMetrics);
+    return () => {
+      window.removeEventListener('wordsetu_wishlist_updated', handleWishlistUpdate);
+      window.removeEventListener('story_library_updated', loadMetrics);
+    };
+  }, []);
+
+  // Today's 20 words from active lesson
   const todayWords = lessonState.words;
 
   const handleSelectLanguage = (lang: Language) => {
     setSelectedLanguage(lang);
     StorageService.setLanguage(lang.code);
 
-    // If a searched external word is currently shown without translations in the newly selected language, fetch them
     if (searchResult && (!searchResult.translations[lang.code] || !searchResult.examples[0].translations[lang.code])) {
       DictionaryService.fetchTranslation(searchResult.word, lang.code).then(transWord => {
         DictionaryService.fetchTranslation(searchResult.examples[0].english, lang.code).then(transEx1 => {
@@ -108,7 +190,6 @@ export default function App() {
   };
 
   const isEntrySaved = (entry: DictionaryEntry): boolean => {
-    // Check if it's a daily word ID
     const dailyMatch = todayWords.find(w => w.word.toLowerCase() === entry.word.toLowerCase());
     if (dailyMatch && savedWordIds.includes(dailyMatch.id)) return true;
     return customSavedEntries.some(e => e.id === entry.id || e.word.toLowerCase() === entry.word.toLowerCase());
@@ -165,44 +246,10 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleGoToLearnWord = (wordId: string) => {
-    const foundIdx = todayWords.findIndex(w => w.id === wordId);
-    if (foundIdx !== -1) {
-      setCurrentLearnIndex(foundIdx);
-      setActiveTab('learn');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // If it's a word from another daily lesson, display its details via dictionary view so user can revise anytime without affecting daily lesson
-      const vocabEntry = VOCABULARY_DATA.find(w => w.id === wordId);
-      if (vocabEntry) {
-        const dictEntry: DictionaryEntry = {
-          id: vocabEntry.id,
-          word: vocabEntry.word,
-          phonetic: vocabEntry.phonetic,
-          partOfSpeech: vocabEntry.partOfSpeech,
-          englishDefinition: vocabEntry.englishDefinition,
-          translations: vocabEntry.translations,
-          examples: vocabEntry.examples,
-          source: 'vocabulary_pool'
-        };
-        setSearchResult(dictEntry);
-        setSearchedQuery(vocabEntry.word);
-        setIsNotFound(false);
-        setSearchError(null);
-        setIsSearchResultOpen(true);
-        setActiveTab('home');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }
-  };
-
-  const handleViewCustomSavedWord = (entry: DictionaryEntry) => {
-    setSearchResult(entry);
-    setSearchedQuery(entry.word);
-    setIsNotFound(false);
-    setSearchError(null);
-    setIsSearchResultOpen(true);
-    setActiveTab('home');
+  const handleOpenStoryReader = (story: Story) => {
+    setActiveStory(story);
+    setIsCreatingStory(false);
+    setActiveTab('stories');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -214,30 +261,77 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={tab => {
           setActiveTab(tab);
-          if (tab !== 'home') setIsSearchResultOpen(false);
+          if (tab !== 'stories') {
+            setActiveStory(null);
+            setIsCreatingStory(false);
+          }
+          if (tab !== 'home' && tab !== 'search') {
+            setIsSearchResultOpen(false);
+          }
         }}
         selectedLanguage={selectedLanguage}
         onOpenLanguageModal={() => setIsLangModalOpen(true)}
         savedWordsCount={totalSavedCount}
         learnedWordsCount={learnedWordIds.filter(id => todayWords.some(w => w.id === id)).length}
+        streakDays={lessonState.streakDays || 1}
+        wishlistCount={wishlistCount}
+        onOpenSearch={() => {
+          setActiveTab('search');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
-      <main className="container" style={{ flex: 1 }}>
+      <main className="container" style={{ flex: 1, minHeight: '80vh' }}>
+        {/* ================= 1. HOME VIEW ================= */}
         {activeTab === 'home' && (
           <>
-            {/* Hero Section */}
+            {/* Section 3: Homepage Hero Section */}
             <HeroSection
               onStartLearning={() => {
                 setActiveTab('learn');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              onStartQuiz={() => {
-                setActiveTab('quiz');
+              onExploreStories={() => {
+                setActiveTab('stories');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               selectedLanguage={selectedLanguage}
               lessonNumber={lessonState.lessonNumber}
               wordsCount={todayWords.length}
+            />
+
+            {/* Section 4: Four Feature Cards */}
+            <FeatureCards
+              onSelectTab={(tab) => {
+                setActiveTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              lessonDay={lessonState.lessonNumber}
+              totalStoriesCount={totalStoriesCount}
+              completedDailyCount={learnedWordIds.filter(id => todayWords.some(w => w.id === id)).length}
+              quizScoreInfo={lastQuizScore}
+            />
+
+            {/* Section 5: Learning Statistics Bar */}
+            <LearningStats
+              streakDays={lessonState.streakDays || 1}
+              totalWordsLearned={learnedWordIds.length}
+              storiesReadCount={storiesReadCount}
+              averageQuizScorePct={averageQuizScorePct}
+            />
+
+            {/* Section 6: Popular Story Categories Carousel */}
+            <StoryCategories
+              onSelectCategory={(categoryId) => {
+                setStoryCategoryFilter(categoryId);
+                setActiveTab('stories');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onViewAllStories={() => {
+                setStoryCategoryFilter('all');
+                setActiveTab('stories');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
 
             {/* Prominent Search Bar on Home Page */}
@@ -276,7 +370,7 @@ export default function App() {
               />
             </div>
 
-            {/* Active Search Meaning Result Card */}
+            {/* Active Search Result Card */}
             {isSearchResultOpen && (
               <SearchResultCard
                 entry={searchResult}
@@ -291,7 +385,7 @@ export default function App() {
               />
             )}
 
-            {/* Daily Dashboard Row: Real Progress & Persistent 24h Countdown */}
+            {/* Daily Dashboard Row */}
             <div className="dashboard-overview-grid">
               <ProgressCard
                 completedCount={learnedWordIds.filter(id => todayWords.some(w => w.id === id)).length}
@@ -311,96 +405,7 @@ export default function App() {
               />
             </div>
 
-            {/* Quick Access Cards */}
-            <section className="quick-access-section">
-              <div className="section-header">
-                <div>
-                  <h2 className="section-title">Quick Learning Hub</h2>
-                  <p style={{ fontSize: '14px', color: '#64748b' }}>
-                    Jump directly into your daily routine or review your saved vocabulary.
-                  </p>
-                </div>
-              </div>
-
-              <div className="quick-cards-grid">
-                {/* Learn Card */}
-                <div
-                  className="quick-card learn"
-                  onClick={() => {
-                    setActiveTab('learn');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div>
-                    <div className="quick-card-icon">
-                      <Sparkles size={26} />
-                    </div>
-                    <h3 className="quick-card-title">Daily 10 Words</h3>
-                    <p className="quick-card-desc">
-                      Explore detailed pronunciation, definitions, two contextual examples, and audio for today's words.
-                    </p>
-                  </div>
-                  <div className="quick-card-action">
-                    <span>Study Lesson</span>
-                    <ArrowRight size={16} />
-                  </div>
-                </div>
-
-                {/* Practice Card */}
-                <div
-                  className="quick-card practice"
-                  onClick={() => {
-                    setActiveTab('quiz');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div>
-                    <div className="quick-card-icon">
-                      <CheckCircle2 size={26} />
-                    </div>
-                    <h3 className="quick-card-title">Practice Quiz</h3>
-                    <p className="quick-card-desc">
-                      Reinforce your retention with an interactive 10-question quiz translated into {selectedLanguage.name}.
-                    </p>
-                  </div>
-                  <div className="quick-card-action">
-                    <span>Start Quiz</span>
-                    <ArrowRight size={16} />
-                  </div>
-                </div>
-
-                {/* Saved Words Card */}
-                <div
-                  className="quick-card saved"
-                  onClick={() => {
-                    setActiveTab('saved');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div>
-                    <div className="quick-card-icon">
-                      <BookmarkCheck size={26} />
-                    </div>
-                    <h3 className="quick-card-title">Saved Words ({totalSavedCount})</h3>
-                    <p className="quick-card-desc">
-                      Revisit words you bookmarked from lessons and dictionary searches with search and pronunciation audio.
-                    </p>
-                  </div>
-                  <div className="quick-card-action" style={{ color: '#db2777' }}>
-                    <span>Open Library</span>
-                    <ArrowRight size={16} />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Today's Words Interactive Preview */}
+            {/* Today's 20 Words Interactive Preview */}
             <TodayWordsPreview
               words={todayWords}
               selectedLanguage={selectedLanguage}
@@ -421,6 +426,7 @@ export default function App() {
           </>
         )}
 
+        {/* ================= 2. DAILY WORDS (LEARN) ================= */}
         {activeTab === 'learn' && (
           <>
             {isSearchResultOpen && (
@@ -453,10 +459,135 @@ export default function App() {
               }}
               onSearchWord={handleSearchWord}
               isSearchLoading={isSearchLoading}
+              lessonNumber={lessonState.lessonNumber}
+              calendarLessonDay={lessonState.calendarLessonDay}
+              onSelectDay={(day) => {
+                const updated = LessonManager.selectLessonDay(day, VOCABULARY_DATA);
+                setLessonState(updated);
+                setCurrentLearnIndex(0);
+              }}
             />
           </>
         )}
 
+        {/* ================= 3. STORIES — KATHASETU ================= */}
+        {activeTab === 'stories' && (
+          <>
+            {activeStory ? (
+              <StoryReader
+                story={activeStory}
+                onBack={() => setActiveStory(null)}
+              />
+            ) : isCreatingStory ? (
+              <div>
+                <button
+                  onClick={() => setIsCreatingStory(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    margin: '10px 0 20px',
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    background: '#ffffff',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: 600
+                  }}
+                >
+                  ← Back to KathaSetu Library
+                </button>
+                <CreateStoryView
+                  onStorySaved={story => {
+                    handleOpenStoryReader(story);
+                  }}
+                  onBrowseLibrary={() => setIsCreatingStory(false)}
+                />
+              </div>
+            ) : (
+              <KathaSetuView
+                onReadStory={handleOpenStoryReader}
+                onCreateStory={() => setIsCreatingStory(true)}
+                onOpenWishlist={() => setActiveTab('wishlist')}
+                initialCategory={storyCategoryFilter}
+              />
+            )}
+          </>
+        )}
+
+        {/* ================= 4. MY STORY WISHLIST ================= */}
+        {activeTab === 'wishlist' && (
+          <MyWishlistView
+            onReadStory={handleOpenStoryReader}
+            onBrowseStories={() => {
+              setActiveTab('stories');
+              setActiveStory(null);
+              setIsCreatingStory(false);
+            }}
+          />
+        )}
+
+        {/* ================= 5. WORD SEARCH ================= */}
+        {activeTab === 'search' && (
+          <div style={{ maxWidth: '820px', margin: '20px auto 60px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.8px',
+                color: '#2563eb',
+                background: '#eff6ff',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                border: '1px solid #bfdbfe'
+              }}>
+                English Dictionary Search
+              </span>
+              <h1 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '28px',
+                fontWeight: 800,
+                color: '#0f172a',
+                marginTop: '8px'
+              }}>
+                Search Any Word in English
+              </h1>
+              <p style={{ fontSize: '14px', color: '#64748b', marginTop: '2px' }}>
+                Instant definitions, phonetic audio, and translations in <strong>{selectedLanguage.name} ({selectedLanguage.nativeName})</strong>.
+              </p>
+            </div>
+
+            <SearchBar
+              onSearch={handleSearchWord}
+              isLoading={isSearchLoading}
+            />
+
+            {isSearchResultOpen && (
+              <div style={{ marginTop: '24px' }}>
+                <SearchResultCard
+                  entry={searchResult}
+                  errorMessage={searchError || undefined}
+                  isNotFound={isNotFound}
+                  searchedQuery={searchedQuery}
+                  selectedLanguage={selectedLanguage}
+                  isSaved={searchResult ? isEntrySaved(searchResult) : false}
+                  onToggleSave={handleToggleSaveSearchedWord}
+                  onClose={() => setIsSearchResultOpen(false)}
+                  onQuickSearch={handleSearchWord}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================= 5. READING TEST ================= */}
+        {activeTab === 'reading_test' && (
+          <ReadingTestView />
+        )}
+
+        {/* ================= 6. QUIZ ================= */}
         {activeTab === 'quiz' && (
           <QuizView
             words={todayWords}
@@ -469,26 +600,61 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'saved' && (
-          <SavedWordsView
+        {/* ================= 7. MY VOCABULARY ================= */}
+        {activeTab === 'vocabulary' && (
+          <MyVocabularyView
             allWords={VOCABULARY_DATA}
             savedWordIds={savedWordIds}
-            customSavedEntries={customSavedEntries}
             learnedWordIds={learnedWordIds}
             selectedLanguage={selectedLanguage}
-            onRemoveSavedId={handleToggleDailySaved}
-            onRemoveCustomSaved={id => {
-              StorageService.removeCustomEntry(id);
-              setCustomSavedEntries(prev => prev.filter(e => e.id !== id));
-            }}
             onToggleLearned={handleToggleLearned}
-            onGoToLearnWord={handleGoToLearnWord}
-            onViewCustomWord={handleViewCustomSavedWord}
+            onRemoveSavedId={handleToggleDailySaved}
             onBrowseWords={() => {
               setActiveTab('learn');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
+        )}
+
+        {/* ================= 8. MY STORY SHELF ================= */}
+        {activeTab === 'shelf' && (
+          <MyStoryShelfView
+            onReadStory={handleOpenStoryReader}
+            onBrowseLibrary={() => {
+              setActiveTab('stories');
+              setActiveStory(null);
+              setIsCreatingStory(false);
+            }}
+            onCreateStory={() => {
+              setActiveTab('stories');
+              setIsCreatingStory(true);
+            }}
+          />
+        )}
+
+        {/* ================= 9. MY PROGRESS ================= */}
+        {activeTab === 'progress' && (
+          <MyProgressView
+            streakDays={lessonState.streakDays || 1}
+            totalWordsLearned={learnedWordIds.length}
+            selectedLanguage={selectedLanguage}
+            onReadStory={handleOpenStoryReader}
+            onGoToDailyWords={() => setActiveTab('learn')}
+          />
+        )}
+
+        {/* ================= 10. SETTINGS ================= */}
+        {activeTab === 'settings' && (
+          <SettingsView
+            selectedLanguage={selectedLanguage}
+            onSelectLanguage={handleSelectLanguage}
+            onOpenAdmin={() => setActiveTab('admin')}
+          />
+        )}
+
+        {/* ================= ADMIN CONTENT MANAGEMENT ================= */}
+        {activeTab === 'admin' && (
+          <AdminDashboard />
         )}
       </main>
 
@@ -496,6 +662,10 @@ export default function App() {
         onSelectLanguage={handleSelectLanguage}
         onNavigate={tab => {
           setActiveTab(tab);
+          if (tab !== 'stories') {
+            setActiveStory(null);
+            setIsCreatingStory(false);
+          }
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
