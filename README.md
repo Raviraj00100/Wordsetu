@@ -80,3 +80,18 @@ npm run dev
 # Build for production
 npm run build
 ```
+
+---
+
+## 🌐 Vercel Public Access & Deployment Configuration
+
+WordSetu is designed as a 100% public, frictionless educational website requiring **no login, no signup, and no authentication**.
+
+### Vercel Dashboard Settings
+To prevent Vercel from prompting visitors with the platform-level **"Log in to Vercel"** or **"Request Sent"** deployment access screens:
+1. Open the project in the [Vercel Dashboard](https://vercel.com).
+2. Go to **Settings** > **Deployment Protection**.
+3. Set **Vercel Authentication** to **Disabled**.
+4. Set **Password Protection** to **Disabled**.
+5. Under **Settings** > **Domains**, verify the primary production domain points to the `main` branch.
+
