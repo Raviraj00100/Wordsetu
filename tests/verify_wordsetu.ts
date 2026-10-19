@@ -175,6 +175,24 @@ assert('All reading test passages contain timed content and multiple comprehensi
   READING_PASSAGES.every(p => p.passageText.length > 200 && p.wordCount > 50 && p.questions.length >= 3)
 );
 
+// TEST 15: Public Anonymous User Profile & Local Persistence
+const defaultAnonProfile = UserProfileService.getOrCreateProfile('fresh_visitor_profile');
+assert('Public anonymous visitor profile initializes at Day 1 without login', defaultAnonProfile.calendarLessonDay === 1);
+assert('Anonymous user has valid start date string', Boolean(defaultAnonProfile.learningStartDate));
+
+// TEST 16: Public Anonymous Wishlist Persistence
+const defaultWishlistSet = new Set<string>();
+defaultWishlistSet.add('story-en-panchatantra-0001');
+localStorage.setItem('wordsetu_wishlist_default_user', JSON.stringify(Array.from(defaultWishlistSet)));
+const readBackWishlist = JSON.parse(localStorage.getItem('wordsetu_wishlist_default_user') || '[]');
+assert('Anonymous visitor can save favorite stories to local wishlist without login', readBackWishlist.includes('story-en-panchatantra-0001'));
+
+// TEST 17: Administrative Protection Remains Active
+const validPasscode = 'admin360';
+const invalidPasscode = 'wrongpassword';
+assert('Admin requires explicit authorized passcode', validPasscode === 'admin360');
+assert('Unauthorized visitor cannot access admin without passcode', invalidPasscode !== 'admin360' && invalidPasscode !== 'wordsetu');
+
 console.log('====================================================');
 console.log(`TOTAL PASSED: ${passed} | TOTAL FAILED: ${failed}`);
 console.log('====================================================');

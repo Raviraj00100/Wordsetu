@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   BookOpen, Sparkles, Library, FileText, CheckCircle2, BookmarkCheck,
-  Heart, Search, Flame, Globe, User, Settings, Award, ChevronDown,
-  Bell, X, Menu, ExternalLink
+  Heart, Search, Flame, Globe, Settings, Award,
+  Bell, X, Menu
 } from 'lucide-react';
 import { Language } from '../data/languages';
 
@@ -43,26 +43,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   wishlistCount = 0,
   onOpenSearch
 }) => {
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [showNotificationToast, setShowNotificationToast] = useState(false);
-  const profileMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close profile dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleNavClick = (tab: ActiveNavTab) => {
     setActiveTab(tab);
     setIsMobileDrawerOpen(false);
-    setIsProfileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -246,82 +232,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="nav-lang-badge">{selectedLanguage.nativeName}</span>
             </button>
 
-            {/* User Profile Menu */}
-            <div className="profile-menu-container" ref={profileMenuRef}>
-              <button
-                className="user-profile-btn"
-                onClick={() => setIsProfileMenuOpen(prev => !prev)}
-                aria-expanded={isProfileMenuOpen}
-                aria-label="User Profile and Menu"
-              >
-                <div className="user-avatar-circle">
-                  <User size={16} />
-                </div>
-                <ChevronDown size={14} className="profile-chevron" />
-              </button>
-
-              {isProfileMenuOpen && (
-                <div className="profile-dropdown-card">
-                  <div className="profile-header-meta">
-                    <div className="profile-greeting">Welcome Learner</div>
-                    <div className="profile-subtext">WordSetu Student Account</div>
-                  </div>
-
-                  <div className="profile-menu-list">
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => handleNavClick('vocabulary')}
-                    >
-                      <BookmarkCheck size={16} color="#2563eb" />
-                      <span>My Vocabulary ({savedWordsCount})</span>
-                    </button>
-
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => handleNavClick('wishlist')}
-                    >
-                      <Heart size={16} color="#e11d48" />
-                      <span>My Story Wishlist ({wishlistCount})</span>
-                    </button>
-
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => handleNavClick('shelf')}
-                    >
-                      <Library size={16} color="#8b5cf6" />
-                      <span>My Story Shelf</span>
-                    </button>
-
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => handleNavClick('progress')}
-                    >
-                      <Award size={16} color="#10b981" />
-                      <span>Learning Progress</span>
-                    </button>
-
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => {
-                        setIsProfileMenuOpen(false);
-                        onOpenLanguageModal();
-                      }}
-                    >
-                      <Globe size={16} color="#0284c7" />
-                      <span>Language: {selectedLanguage.name}</span>
-                    </button>
-
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => handleNavClick('settings')}
-                    >
-                      <Settings size={16} color="#64748b" />
-                      <span>Settings</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Settings & Preferences Button */}
+            <button
+              className={`toolbar-icon-btn hide-on-mobile ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => handleNavClick('settings')}
+              title="Platform Settings & Preferences"
+              aria-label="Settings"
+            >
+              <Settings size={18} />
+            </button>
 
             {/* Mobile Drawer Toggle */}
             <button
@@ -448,12 +367,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
-            className={`mobile-tab-btn ${['progress', 'settings', 'shelf', 'vocabulary'].includes(activeTab) || isMobileDrawerOpen ? 'active' : ''}`}
-            onClick={() => setIsMobileDrawerOpen(prev => !prev)}
-            aria-label="Profile and Menu"
+            className={`mobile-tab-btn ${activeTab === 'wishlist' ? 'active' : ''}`}
+            onClick={() => handleNavClick('wishlist')}
+            aria-label="Wishlist"
           >
-            <User size={18} />
-            <span>Profile</span>
+            <Heart
+              size={18}
+              fill={activeTab === 'wishlist' ? '#e11d48' : 'none'}
+              color={activeTab === 'wishlist' ? '#e11d48' : 'currentColor'}
+            />
+            <span>Wishlist</span>
             {wishlistCount > 0 && (
               <span className="mobile-wishlist-count" title={`${wishlistCount} saved in wishlist`}>
                 {wishlistCount}
