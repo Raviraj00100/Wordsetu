@@ -161,21 +161,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right Toolbar: Search, Notifications/Streak, Language & Profile Menu */}
+          {/* Right Toolbar: Streamlined controls (Search, Streak, Lang, Hamburger) */}
           <div className="navbar-right-toolbar">
-            {/* Search Icon / Button */}
+            {/* Search Icon / Button (Desktop) */}
             <button
-              className="toolbar-icon-btn search-trigger"
+              className="toolbar-icon-btn search-trigger hide-on-mobile"
               onClick={handleSearchClick}
               title="Search English Vocabulary"
               aria-label="Search Dictionary"
             >
               <Search size={18} />
-              <span className="search-key-hint hide-on-mobile">Search</span>
+              <span className="search-key-hint">Search</span>
             </button>
 
-            {/* Notifications Trigger */}
-            <div style={{ position: 'relative' }}>
+            {/* Notifications Trigger (Desktop) */}
+            <div className="hide-on-mobile" style={{ position: 'relative' }}>
               <button
                 className="toolbar-icon-btn notification-trigger"
                 onClick={() => setShowNotificationToast(prev => !prev)}
@@ -216,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Daily Streak Indicator */}
             <div className="nav-streak-pill" title="Current Daily Streak">
-              <Flame size={16} className="streak-flame" />
+              <Flame size={15} className="streak-flame" />
               <span>{streakDays}d</span>
             </div>
 
@@ -278,8 +278,31 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="drawer-links-list">
+              {/* Daily Streak Banner in Drawer */}
+              <div style={{
+                margin: '4px 10px 10px',
+                padding: '10px 12px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
+                border: '1px solid #fed7aa',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <Flame size={20} color="#ea580c" />
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#9a3412' }}>
+                    {streakDays} Day Learning Streak
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#c2410c' }}>
+                    Study today's 20 words to keep your streak burning!
+                  </div>
+                </div>
+              </div>
+
               {[
                 { id: 'home', label: 'Home', icon: BookOpen },
+                { id: 'search', label: 'Search Dictionary', icon: Search },
                 { id: 'learn', label: 'Daily Words (20 Words)', icon: Sparkles },
                 { id: 'stories', label: 'Stories Library', icon: Library },
                 { id: 'reading_test', label: 'Reading Test & WPM', icon: FileText },
@@ -327,7 +350,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       )}
 
-      {/* Mobile Bottom Navigation Bar (Home, Daily Words, Stories, Quiz, Profile) */}
+      {/* Mobile Bottom Navigation Bar (Home, Daily 20, Stories, Quiz, Wishlist) */}
       <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div className="mobile-bottom-grid">
           <button
@@ -342,10 +365,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             className={`mobile-tab-btn ${activeTab === 'learn' ? 'active' : ''}`}
             onClick={() => handleNavClick('learn')}
-            aria-label="Daily Words"
+            aria-label="Daily 20"
           >
             <Sparkles size={18} />
-            <span>Daily Words</span>
+            <span>Daily 20</span>
           </button>
 
           <button

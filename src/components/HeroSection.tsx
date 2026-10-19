@@ -25,7 +25,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="hero-badge-pill">
             <span className="hero-badge-pulse" />
             <Sparkles size={14} color="#f59e0b" />
-            <span>Day {lessonNumber} • {wordsCount} New Words Every 24 Hours</span>
+            <span>Day {lessonNumber} • {wordsCount} Words Today</span>
           </div>
 
           <h1 className="hero-headline">

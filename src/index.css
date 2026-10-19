@@ -3475,207 +3475,308 @@ html, body {
 }
 
 /* Responsive Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+
 @media (max-width: 768px) {
   .container {
     width: 100% !important;
     max-width: 100% !important;
-    padding-left: 14px !important;
-    padding-right: 14px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     box-sizing: border-box !important;
   }
 }
 
 @media (max-width: 360px) {
   .container {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
 }
 
 /* Safe-Area Bottom Clearance for Fixed Mobile Nav */
 @media (max-width: 1024px) {
   body {
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
-  main {
+  main, .main-content-layout {
     padding-bottom: 24px;
+    width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
 /* 1. Header & Navigation Mobile Optimization */
 @media (max-width: 768px) {
   .navbar-wrapper {
-    height: 56px !important;
+    height: 60px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .navbar-container {
-    height: 56px !important;
-    padding: 0 12px !important;
+    height: 60px !important;
+    padding: 0 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
   }
   .navbar-brand {
     gap: 8px !important;
+    flex-shrink: 0 !important;
   }
   .brand-logo-frame {
-    width: 34px !important;
-    height: 34px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 10px !important;
   }
   .brand-logo-img {
-    width: 24px !important;
-    height: 24px !important;
+    width: 26px !important;
+    height: 26px !important;
   }
   .brand-name {
-    font-size: 18px !important;
-    letter-spacing: -0.3px !important;
+    font-size: 20px !important;
+    letter-spacing: -0.4px !important;
   }
   .brand-tagline {
-    font-size: 9px !important;
+    font-size: 9.5px !important;
   }
   .navbar-right-toolbar {
-    gap: 6px !important;
-  }
-  .toolbar-icon-btn {
-    width: 34px !important;
-    height: 34px !important;
-    border-radius: 10px !important;
-  }
-  .search-trigger {
-    padding: 0 10px !important;
-    height: 34px !important;
+    gap: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
   }
   .nav-streak-pill {
-    padding: 4px 8px !important;
-    font-size: 11.5px !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
     border-radius: 9999px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
   }
   .mobile-hamburger-btn {
-    width: 34px !important;
-    height: 34px !important;
+    width: 38px !important;
+    height: 38px !important;
     border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
   }
 
   /* Fixed Bottom Nav Bar */
   .mobile-bottom-nav {
     display: block !important;
-    height: 60px !important;
-    padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px)) !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 4px 0 env(safe-area-inset-bottom, 0px) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-top: 1px solid #e2e8f0 !important;
+    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08) !important;
+    z-index: 900 !important;
+    box-sizing: border-box !important;
   }
   .mobile-bottom-grid {
     display: grid !important;
     grid-template-columns: repeat(5, 1fr) !important;
-    gap: 2px !important;
-    height: 100% !important;
+    width: 100% !important;
+    height: 50px !important;
+    gap: 0 !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
   }
   .mobile-tab-btn {
-    font-size: 10.5px !important;
+    font-size: 11px !important;
     gap: 2px !important;
     min-width: 0 !important;
-    padding: 2px !important;
+    padding: 3px 1px !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    box-sizing: border-box !important;
   }
   .mobile-tab-btn span {
+    font-size: 11px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     max-width: 100% !important;
+    line-height: 1 !important;
   }
   .mobile-wishlist-count {
-    top: 2px !important;
-    right: 12% !important;
+    position: absolute !important;
+    top: 1px !important;
+    right: 18% !important;
     font-size: 9px !important;
+    font-weight: 800 !important;
     padding: 1px 4px !important;
+    border-radius: 9999px !important;
+    background: #e11d48 !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
   }
 }
 
 /* 2. Hero Banner Mobile Optimization */
 @media (max-width: 900px) {
   .hero-redesign-banner {
-    padding: 16px 0 20px !important;
+    padding: 12px 0 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .hero-banner-inner {
     grid-template-columns: 1fr !important;
-    padding: 22px 16px !important;
-    gap: 20px !important;
+    padding: 20px 16px !important;
+    gap: 16px !important;
     border-radius: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .hero-text-column {
     width: 100% !important;
+    max-width: 100% !important;
     align-items: stretch !important;
+    box-sizing: border-box !important;
   }
   .hero-badge-pill {
-    font-size: 11.5px !important;
+    font-size: 11px !important;
     padding: 4px 10px !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 8px !important;
     max-width: 100% !important;
     white-space: normal !important;
     line-height: 1.3 !important;
+    align-self: flex-start !important;
   }
   .hero-headline {
-    font-size: clamp(24px, 6.5vw, 34px) !important;
+    font-size: clamp(22px, 5.8vw, 32px) !important;
     line-height: 1.2 !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
     word-break: break-word !important;
   }
   .hero-tagline {
-    font-size: clamp(14.5px, 4.2vw, 18px) !important;
+    font-size: clamp(14px, 3.8vw, 17px) !important;
     line-height: 1.35 !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
   }
   .hero-description {
-    font-size: 13.5px !important;
+    font-size: clamp(12.5px, 3.4vw, 14px) !important;
     line-height: 1.5 !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 14px !important;
+    max-width: 100% !important;
   }
   .hero-quote-card {
     padding: 10px 12px !important;
     border-radius: 10px !important;
-    margin-bottom: 18px !important;
+    margin-bottom: 14px !important;
     width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
   .quote-text {
-    font-size: 12.5px !important;
-    line-height: 1.4 !important;
+    font-size: clamp(11.5px, 3.2vw, 12.5px) !important;
+    line-height: 1.45 !important;
   }
   .hero-cta-group {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
     gap: 10px !important;
-    margin-bottom: 18px !important;
+    margin-bottom: 14px !important;
   }
   .hero-btn-primary, .hero-btn-secondary {
     width: 100% !important;
-    padding: 13px 18px !important;
-    font-size: 14.5px !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
     justify-content: center !important;
     box-sizing: border-box !important;
   }
   .hero-language-strip {
-    padding-top: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
     gap: 8px !important;
+    padding-top: 12px !important;
+    box-sizing: border-box !important;
+  }
+  .hero-strip-label {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
   }
   .hero-lang-pills {
-    gap: 4px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   .lang-pill {
-    font-size: 10.5px !important;
-    padding: 2px 6px !important;
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+  .lang-pill-more {
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    background: #eff6ff !important;
+    border-radius: 6px !important;
+    border: 1px solid #bfdbfe !important;
   }
   .hero-illustration-column {
     width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .hero-illustration-frame {
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 18px !important;
+    border-radius: 16px !important;
     box-sizing: border-box !important;
   }
   .hero-scenic-image {
     width: 100% !important;
     height: auto !important;
-    max-height: 220px !important;
-    aspect-ratio: 16/10 !important;
+    max-height: 160px !important;
+    aspect-ratio: 16/9 !important;
     object-fit: cover !important;
   }
   .hero-illustration-glass-badge {
@@ -3698,13 +3799,13 @@ html, body {
 
 @media (max-width: 360px) {
   .hero-banner-inner {
-    padding: 14px 10px !important;
+    padding: 16px 12px !important;
   }
   .hero-headline {
-    font-size: 22px !important;
+    font-size: 20px !important;
   }
   .hero-tagline {
-    font-size: 14px !important;
+    font-size: 13.5px !important;
   }
 }
 

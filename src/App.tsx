@@ -281,10 +281,10 @@ export default function App() {
         }}
       />
 
-      <main className="container" style={{ flex: 1, minHeight: '80vh' }}>
+      <main className="main-content-layout" style={{ flex: 1, minHeight: '80vh', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
         {/* ================= 1. HOME VIEW ================= */}
         {activeTab === 'home' && (
-          <>
+          <div className="container homepage-container">
             {/* Section 3: Homepage Hero Section */}
             <HeroSection
               onStartLearning={() => {
@@ -423,12 +423,12 @@ export default function App() {
                 window.scrollTo({ top: 350, behavior: 'smooth' });
               }}
             />
-          </>
+          </div>
         )}
 
         {/* ================= 2. DAILY WORDS (LEARN) ================= */}
         {activeTab === 'learn' && (
-          <>
+          <div className="container" style={{ width: '100%', maxWidth: '1000px', margin: '0 auto', boxSizing: 'border-box' }}>
             {isSearchResultOpen && (
               <SearchResultCard
                 entry={searchResult}
@@ -467,7 +467,7 @@ export default function App() {
                 setCurrentLearnIndex(0);
               }}
             />
-          </>
+          </div>
         )}
 
         {/* ================= 3. STORIES — KATHASETU ================= */}
@@ -530,7 +530,7 @@ export default function App() {
 
         {/* ================= 5. WORD SEARCH ================= */}
         {activeTab === 'search' && (
-          <div style={{ maxWidth: '820px', margin: '20px auto 60px' }}>
+          <div className="container" style={{ maxWidth: '820px', margin: '20px auto 60px', width: '100%', boxSizing: 'border-box' }}>
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               <span style={{
                 fontSize: '12px',
@@ -589,15 +589,17 @@ export default function App() {
 
         {/* ================= 6. QUIZ ================= */}
         {activeTab === 'quiz' && (
-          <QuizView
-            words={todayWords}
-            selectedLanguage={selectedLanguage}
-            onReviewWords={() => {
-              setActiveTab('learn');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onBackToHome={() => setActiveTab('home')}
-          />
+          <div className="container" style={{ width: '100%', maxWidth: '900px', margin: '0 auto', boxSizing: 'border-box' }}>
+            <QuizView
+              words={todayWords}
+              selectedLanguage={selectedLanguage}
+              onReviewWords={() => {
+                setActiveTab('learn');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onBackToHome={() => setActiveTab('home')}
+            />
+          </div>
         )}
 
         {/* ================= 7. MY VOCABULARY ================= */}
